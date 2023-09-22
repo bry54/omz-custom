@@ -1,0 +1,32 @@
+# Add your own custom plugins in the custom/plugins directory. Plugins placed
+# here will override ones with the same name in the main plugins directory.
+#
+new-project () {
+    projectName="$1"
+    basePath="$2"
+
+    projectPath="~/Development/Personal/$projectName";
+
+    if [ -n "$basePath" ]; then
+        projectPath="$basePath/$projectName"
+    fi
+
+    if [ -z "$projectName" ]; then
+        echo "Please provide project name."
+    else
+        eval mkdir -p $projectPath/{Documents,Code,Assets,Notes,Archives}
+    fi
+}
+
+new-client () {
+    clientName="$1"
+    projectName="$2"
+
+    if [ -z "$clientName" ] ||[ -z "$projectName" ]; then
+        echo "Please provide client and project name."
+    else
+        basePath="~/Development/Work/$clientName"
+        eval mkdir -p "$basePath"
+        new-project "$projectName" "$basePath"
+    fi
+}
