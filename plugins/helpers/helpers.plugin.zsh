@@ -50,7 +50,7 @@ function getcontentlength() {
 
       echo "Downloading $URL to $file_path..."
       # Use curl to download the file with the specified path and name
-      curl -o "$file_path" "$URL"
+      curl -C - -o "$file_path" "$URL"
       echo "Download completed. Saved as: $file_path"
   else
       echo "Download canceled."
@@ -86,4 +86,61 @@ function bulkextensiontransformer(){
     done
 
     echo "Renaming completed."
+}
+
+# Function to recursively list all files in a directory and write to a CSV file
+exportdirfiles() {
+    local parent_dir="$1"
+    local output_file="/Users/brian/Downloads/what-we-do/output.csv"
+
+    # Check if the directory exists
+    if [[ ! -d "$parent_dir" ]]; then
+        echo "Error: Directory $parent_dir does not exist."
+        #exit 1
+    fi
+
+    # Create CSV header
+    echo "Name,Size (MB),Path" > "$output_file"
+    
+    # Find all files starting from the parent directory, sort by name, and then process
+    find "$parent_dir" -type f | sort | while read -r file; do
+        size=$(du -m "$file" | awk '{print $1}')
+        echo "$(basename "$file"),$size,$file" >> "$output_file"
+    done
+    
+    echo "CSV file generated: $output_file"
+}
+
+# Function to generate random MD5 string
+generatemd5() {
+    #echo -n "$(date +%s%N)$RANDOM" | md5
+    cat /dev/urandom | LC_CTYPE=C tr -dc 'a-f0-9' | head -c 32 | md5
+}
+
+bulkerosrname(){
+    # Directory containing files to be renamed
+    directory="$1"
+
+    # Check if the directory exists
+    if [ ! -d "$directory" ]; then
+        echo "Directory '$directory' not found."
+        exit 1
+    fi
+
+    # Iterate over each file in the directory and its subdirectories
+    find "$directory" -type f -print0 | while IFS= read -r -d '' file; do
+        # Generate a random MD5 string
+        random_md5=$(generatemd5)
+
+        # Get the file extension
+        extension="${file##*.}"
+
+        # Rename the file with the random MD5 string and original extension
+        mv "$file" "${file%/*}/$random_md5.$extension"
+
+        # Print the old and new file names
+        echo "Renamed '$file' to '${file%/*}/$random_md5.$extension'"
+    done
+
+    echo "All files renamed successfully."
 }
