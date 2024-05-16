@@ -7,14 +7,14 @@ function hf.init(){
         case "$1" in
             --uname) username="$2"; shift ;;
             --project) project="$2"; shift ;;
-            *) echo "Usage: hf.env --uname <username> --project <project-name>" >&2; return 1 ;;
+            *) echo $fg[red] "Usage: hf.env --uname <username> --project <project-name>" >&2; return 1 ;;
         esac
         shift
     done
 
     # Validate required parameters
     if [ -z "$username" ] || [ -z "$project" ]; then
-        echo "Usage: hf.env --uname <username> --project <project-name>" >&2
+        echo $fg[red] "Usage: hf.env --uname <username> --project <project-name>" >&2
         return 1
     fi
 
@@ -31,14 +31,16 @@ function hf.init(){
 
     source "$HOME/.zshrc"
 
-    echo "Environment initialized:"
-    echo "HF_USERNAME=$HF_USERNAME"
-    echo "HF_PROJECT=$HF_PROJECT"
-    echo "HF_BINARIES=$HF_BINARIES"
-    echo "HF_CONFIGS=$FABRIC_CFG_PATH"
-    echo "HF_NETWORK_DIR=$HF_NETWORK_DIR"
+    echo $fg[red] "Environment initialized:"
+    echo $fg[yellow] "HF_USERNAME=$HF_USERNAME"
+    echo $fg[yellow] "HF_PROJECT=$HF_PROJECT"
+    echo $fg[yellow] "HF_BINARIES=$HF_BINARIES"
+    echo $fg[yellow] "HF_CONFIGS=$FABRIC_CFG_PATH"
+    echo $fg[yellow] "HF_NETWORK_DIR=$HF_NETWORK_DIR"
 
     cd "$HF_SAMPLES/$HF_PROJECT"
+
+    echo $fg[green] "Install all npm modules from ./common-configs => cd ./common-configs && npm install"
 }
 
 network.sh() {
@@ -47,13 +49,13 @@ network.sh() {
 
     # Check if the script exists
     if [ ! -f "$script_path" ]; then
-        echo "Network script not found at: $script_path"
+        echo $fg[red] "Network script not found at: $script_path"
         return 1
     fi
 
     # Check if any parameters are provided
     if [ "$#" -eq 0 ]; then
-        echo "Usage: hf-network -h to show all the commands executable on hyperledger network"
+        echo $fg[red] "Usage: hf-network -h to show all the commands executable on hyperledger network"
         return 1
     fi
 
@@ -64,7 +66,7 @@ network.sh() {
 hf.new.chaincode() {
     # Check if no arguments provided
     if [ $# -eq 0 ]; then
-        echo "No arguments provided. Please pass the asset name."
+        echo $fg[red] "No arguments provided. Please pass the asset name."
         exit 1
     fi
 
@@ -87,16 +89,16 @@ hf.new.chaincode() {
     cd "$chaincodeDir"
 
     # Create a new directory with the asset directory name and navigate to it
-    echo "Creating and navigating to directory for asset: $assetDirName"
-    echo "packageName=${packageName}"
-    echo "assetFileName=${assetFileName}"
-    echo "assetClassName=${assetClassName}"
-    echo "assetDirName=${assetDirName}"
+    echo $fg[yellow] "Creating and navigating to directory for asset: $assetDirName"
+    echo $fg[yellow] "packageName=${packageName}"
+    echo $fg[yellow] "assetFileName=${assetFileName}"
+    echo $fg[yellow] "assetClassName=${assetClassName}"
+    echo $fg[yellow] "assetDirName=${assetDirName}"
 
     mkdir "$packageName" && cd "$packageName"
 
     # Copy your tsconfig.json and package.json
-    echo "Copying common configuration files"
+    echo $fg[blue] "Copying common configuration files"
     cp ${commonConfigsPath}/tsconfig.json .
     cp ${commonConfigsPath}/package.json .
     cp ${commonConfigsPath}/.gitignore .
@@ -105,20 +107,21 @@ hf.new.chaincode() {
     cp -R ${commonConfigsPath}/docker .
 
     # Modify the name in package.json using jq
-    echo "Modifying name in package.json"
+    echo $fg[blue] "Modifying name in package.json"
     jq --arg newName "$packageName" '.name = $newName' package.json > package.temp.json && mv package.temp.json package.json
 
     # Modify the description in package.json using jq
-    echo "Modifying description in package.json"
+    echo $fg[blue] "Modifying description in package.json"
     jq --arg newDescription "Chaincode for managing $assetName" '.description = $newDescription' package.json > package.temp.json && mv package.temp.json package.json
 
     # Modify the scripts section in package.json using jq
     dockerCommand="docker build -f ./Dockerfile -t $packageName ."
-    echo "Adding docker command to package.json"
+    echo $fg[blue] "Adding docker command to package.json"
     jq --arg dockerCmd "$dockerCommand" '.scripts += {"start": "tsc && node ./dist/index.js", "docker": $dockerCmd}' package.json > package.temp.json && mv package.temp.json package.json
 
-    echo "Installing npm dependencies"
-    npm install
+    echo $fg[blue] "Creating sym link to npm modules"
+    #npm install
+    ln -s ${commonConfigsPath}/node_modules .
 
     mkdir src && cd src
 
@@ -126,7 +129,7 @@ hf.new.chaincode() {
     #touch index.ts "${assetFileName}.ts" "${assetDirName}.ts" "${assetDirName}.test.ts"
 
     # Write content to TypeScript files
-    echo "Writing content to TypeScript files"
+    echo $fg[blue] "Writing content to TypeScript files"
 
     echo "/*
 SPDX-License-Identifier: Apache-2.0
@@ -143,7 +146,7 @@ export class ${assetClassName} {
     //other properties here
 }" > "${assetFileName}.ts"
 
-    echo "Created ${assetFileName}.ts"
+    echo $fg[green] "Created ${assetFileName}.ts"
 
     echo "/*
 * SPDX-License-Identifier: Apache-2.0
@@ -162,7 +165,7 @@ export class ${assetClassName}ManagerContract extends Contract{
         //Implement any logic to initialise the ledger
     }
 }" > "${assetDirName}.ts"
-    echo "Created ${assetDirName}.ts"
+    echo $fg[green] "Created ${assetDirName}.ts"
 
     echo "import { Context } from 'fabric-contract-api';
 import { ${assetClassName}ManagerContract } from './${assetDirName}';
@@ -192,7 +195,7 @@ describe('${assetClassName}ManagerContract', () => {
         // implement the test here
     });
 })" > "${assetDirName}.test.ts"
-    echo "Created ${assetDirName}.test.ts"
+    echo $fg[green] "Created ${assetDirName}.test.ts"
 
     echo "/*
 * SPDX-License-Identifier: Apache-2.0
@@ -204,7 +207,7 @@ export { ${assetClassName}ManagerContract } from './${assetDirName}';
 
 export const contracts: any[] = [ ${assetClassName}ManagerContract ];
 " > "index.ts"
-    echo "Created index.ts"
+    echo $fg[green] "Created index.ts"
 
     cd "$chaincodeDir"
 }
