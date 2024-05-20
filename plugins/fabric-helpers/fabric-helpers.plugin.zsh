@@ -251,20 +251,24 @@ hf.deploy.chaincode(){
     ccname="$1"
     ccpath="$2"
     ccversion="$3"
+    channelname="$4"
     # Validate required parameters
     if [ -z "$ccname" ] || [ -z "$ccpath" ] || [ -z "$ccversion" ]; then
-        echo "Usage: hf.deploy.chaincode <chaincodeName> <chaincodePath> <chaincodeVersion>" >&2
+        echo "Usage: hf.deploy.chaincode <chaincodeName> <chaincodePath> <chaincodeVersion> <channelName>" >&2
         return 1
     fi
 
-    peer lifecycle chaincode package ${ccname}.tar.gz --path "${ccpath}" --lang node --label ${ccname}_${ccversion}
-    echo "Successfully created chaincode package: ${ccname}.tar.gz"
+    network.sh deployCC -ccn ${ccname} -ccp ${ccpath} -ccl typescript -ccv ${ccversion} -c ${channelname}
 
-    hf.use.org1
-    peer lifecycle chaincode install ${ccname}.tar.gz
 
-    hf.use.org2
-    peer lifecycle chaincode install ${ccname}.tar.gz
+    #peer lifecycle chaincode package ${ccname}.tar.gz --path "${ccpath}" --lang node --label ${ccname}_${ccversion}
+    #echo "Successfully created chaincode package: ${ccname}.tar.gz"
+
+    #hf.use.org1
+    #peer lifecycle chaincode install ${ccname}.tar.gz
+
+    #hf.use.org2
+    #peer lifecycle chaincode install ${ccname}.tar.gz
 
 }
 
