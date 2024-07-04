@@ -147,5 +147,10 @@ bulkerosrname(){
 
 container-shell(){
   echo "CMD: docker exec -it $1 /bin/zsh"
-  docker exec -it $1 /bin/zsh
+  if docker exec -it $1 /bin/zsh; then
+    echo "Zsh shell started successfully."
+  else
+    echo "Zsh failed, falling back to Bash shell."
+    docker exec -it $1 /bin/bash
+  fi
 }
