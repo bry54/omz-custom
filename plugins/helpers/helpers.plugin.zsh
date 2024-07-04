@@ -144,3 +144,8 @@ bulkerosrname(){
 
     echo "All files renamed successfully."
 }
+
+container-shell(){
+  echo "CMD: docker exec -it $1 /bin/zsh"
+  docker exec -it $1 /bin/zsh
+}
