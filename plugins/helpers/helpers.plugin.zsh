@@ -117,34 +117,6 @@ generatemd5() {
     cat /dev/urandom | LC_CTYPE=C tr -dc 'a-f0-9' | head -c 32 | md5
 }
 
-bulkerosrname(){
-    # Directory containing files to be renamed
-    directory="$1"
-
-    # Check if the directory exists
-    if [ ! -d "$directory" ]; then
-        echo "Directory '$directory' not found."
-        exit 1
-    fi
-
-    # Iterate over each file in the directory and its subdirectories
-    find "$directory" -type f -print0 | while IFS= read -r -d '' file; do
-        # Generate a random MD5 string
-        random_md5=$(generatemd5)
-
-        # Get the file extension
-        extension="${file##*.}"
-
-        # Rename the file with the random MD5 string and original extension
-        mv "$file" "${file%/*}/$random_md5.$extension"
-
-        # Print the old and new file names
-        echo "Renamed '$file' to '${file%/*}/$random_md5.$extension'"
-    done
-
-    echo "All files renamed successfully."
-}
-
 container-shell(){
   echo "CMD: docker exec -it $1 /bin/zsh"
   if docker exec -it $1 /bin/zsh; then
