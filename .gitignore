@@ -1,0 +1,7 @@
+zsh-syntax-highlighting
+zsh-autosuggestions
+zsh-completions
+plugins/.DS_Store
+themes/.DS_Store
+.DS_Store
+.idea
