@@ -118,7 +118,7 @@ generatemd5() {
 }
 
 container-shell(){
-  echo "CMD: docker exec -it $1 /bin/zsh"
+  echo $fg_bold[yellow] "CMD: docker exec -it $1 /bin/zsh"
   if docker exec -it $1 /bin/zsh; then
     echo "Zsh shell started successfully."
   else
