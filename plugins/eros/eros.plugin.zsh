@@ -5,7 +5,7 @@ bulkerosrname(){
     # Check if the directory exists
     if [ ! -d "$directory" ]; then
         echo "Directory '$directory' not found."
-        exit 1
+        return 1
     fi
 
     # Iterate over each file in the directory and its subdirectories
@@ -38,7 +38,7 @@ starteros(){
   # Check if the directory exists
   if [ ! -d "$EROS_HOME" ]; then
       echo "Directory '$directory' not found."
-      exit 1
+      return 1
   fi
   
   docker run -d \
