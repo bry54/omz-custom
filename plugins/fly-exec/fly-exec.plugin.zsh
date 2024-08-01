@@ -45,6 +45,17 @@ function fly-exec-go(){
   docker run -it --rm \
   -v "$PWD":"$WORKING_DIR" \
   -w "$WORKING_DIR" \
-  golang:1.22 
+  golang:1.22 \
   /bin/bash
+}
+
+function fly-exec-nginx(){
+  APP_DIR="$1"
+  WORKING_DIR="/usr/share/nginx/html"
+
+  docker run --rm \
+  --name nginx \
+  -v "$APP_DIR":"$WORKING_DIR":ro \
+  -p 8080:80 \
+  -d nginx
 }
