@@ -10,9 +10,9 @@ new-project () {
     fi
 
     if [ -n "$projectName" ]; then
-       projectPath="~/Development/Personal/$projectName" 
-    fi 
-    
+       projectPath="~/Development/Personal/$projectName"
+    fi
+
     eval mkdir -p $projectPath/{Documents,Code,Assets,Notes,Archives}
 }
 
@@ -31,3 +31,5 @@ new-client () {
 
 alias personal-projects="cd ~/Development/Personal/"
 alias work-projects="~/Development/Work/"
+alias aws='docker run --rm -ti -v $(pwd)/aws:/root/.aws -v $(pwd)/fs:/aws amazon/aws-cli'
+alias composer='docker run --rm --interactive --tty -v $(pwd):/app composer'
