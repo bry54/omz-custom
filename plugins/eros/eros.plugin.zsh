@@ -1,4 +1,3 @@
-# Function to generate random MD5 string
 md5string() {
     #echo -n "$(date +%s%N)$RANDOM" | md5
     cat /dev/urandom | LC_CTYPE=C tr -dc 'a-f0-9' | head -c 32 | md5
@@ -12,7 +11,7 @@ erosbulkrename(){
     dest_directory="$2"
 
     # Log file to store renaming details
-    log_file=".eroslog.txt"
+    log_file="$dest_directory/vid-collection.log"
 
     # Check if the source directory exists
     if [ ! -d "$source_directory" ]; then
@@ -56,13 +55,13 @@ erosbulkrename(){
 
 erosserve(){
   EROS_HOME="$1"
-  
+
   # Check if the directory exists
   if [ ! -d "$EROS_HOME" ]; then
-      echo "Directory '$directory' not found."
+      echo "Directory '$EROS_HOME' not found."
       return 1
   fi
-  
+
   docker run -d \
   --name eros \
   --restart no \
@@ -85,12 +84,7 @@ erosserve(){
   stashapp/stash:latest
 }
 
-# Function to generate random MD5 string
-eroszip() {
-  zip -0 -r "$1" "$2"
-}
-
-eroscollect(){
+eros-video-collect(){
   source="$1"
   destination="$2"
   extenstions=("vid" "mp4")
@@ -117,6 +111,44 @@ eroscollect(){
 
   find "$base_directory" -type d -empty -exec rmdir {} +
   echo "Empty folders cleaned up."
+}
+
+eros-image-collect(){
+	if [ $# -ne 2 ]; then
+	  echo "Usage: $0 <source_directory> <destination_directory>"
+	  exit 1
+	fi
+
+	# Define source and destination directories
+	SOURCE_DIR="$1"
+	DEST_DIR="$2"
+	LOG_FILE="$DEST_DIR/img-collection.log"
+
+	# Iterate over each folder in the source directory
+	for folder in "$SOURCE_DIR"/*; do
+	  if [ -d "$folder" ]; then
+	    # Get the folder name and zip file name
+	    FOLDER_NAME=$(basename "$folder")
+		random_md5=$(md5string)
+	    ZIP_FILE="${random_md5}.zip"
+
+
+	    # Create the zip file and move it to the destination directory
+	    # Zip the contents without full path and move to destination
+		(cd "$folder" && zip -r -j "../$ZIP_FILE" . > /dev/null)
+    	mv "$SOURCE_DIR/$ZIP_FILE" "$DEST_DIR"
+
+	    # Append to the log file
+	    echo "$ZIP_FILE -> $folder" >> "$LOG_FILE"
+
+		# Delete the original folder
+    	rm -rf "$folder"
+
+	    echo "Zipped and moved: $FOLDER_NAME"
+	  fi
+	done
+
+	echo "All folders processed. Log file updated at $LOG_FILE"
 }
 
 erosmockup(){

@@ -1,4 +1,25 @@
-function hf.init(){
+# Developed this plugin to help with Hyperledger Fabric development during my Masters Thesis
+network.sh() {
+    # Path to the network.sh script
+    script_path="$HF_NETWORK_DIR/network.sh"
+
+    # Check if the script exists
+    if [ ! -f "$script_path" ]; then
+        echo $fg[red] "Network script not found at: $script_path"
+        return 1
+    fi
+
+    # Check if any parameters are provided
+    if [ "$#" -eq 0 ]; then
+        echo $fg[red] "Usage: hf-network -h to show all the commands executable on hyperledger network"
+        return 1
+    fi
+
+    # Execute the network.sh script with provided parameters
+    "$script_path" "$@"
+}
+
+hf.init(){
     local username
     local project
 
@@ -41,26 +62,6 @@ function hf.init(){
     cd "$HF_SAMPLES/$HF_PROJECT"
 
     echo $fg[green] "Install all npm modules from ./common-configs => cd ./common-configs && npm install"
-}
-
-network.sh() {
-    # Path to the network.sh script
-    script_path="$HF_NETWORK_DIR/network.sh"
-
-    # Check if the script exists
-    if [ ! -f "$script_path" ]; then
-        echo $fg[red] "Network script not found at: $script_path"
-        return 1
-    fi
-
-    # Check if any parameters are provided
-    if [ "$#" -eq 0 ]; then
-        echo $fg[red] "Usage: hf-network -h to show all the commands executable on hyperledger network"
-        return 1
-    fi
-
-    # Execute the network.sh script with provided parameters
-    "$script_path" "$@"
 }
 
 hf.new.chaincode() {
@@ -212,7 +213,6 @@ export const contracts: any[] = [ ${assetClassName}ManagerContract ];
     cd "$chaincodeDir"
 }
 
-
 hf.monitor.network(){
     # Path to the network.sh script
     script_path="$HF_NETWORK_DIR/monitordocker.sh"
@@ -259,17 +259,6 @@ hf.deploy.chaincode(){
     fi
 
     network.sh deployCC -ccn ${ccname} -ccp ${ccpath} -ccl typescript -ccv ${ccversion} -c ${channelname}
-
-
-    #peer lifecycle chaincode package ${ccname}.tar.gz --path "${ccpath}" --lang node --label ${ccname}_${ccversion}
-    #echo "Successfully created chaincode package: ${ccname}.tar.gz"
-
-    #hf.use.org1
-    #peer lifecycle chaincode install ${ccname}.tar.gz
-
-    #hf.use.org2
-    #peer lifecycle chaincode install ${ccname}.tar.gz
-
 }
 
 hf.peer.approve(){
