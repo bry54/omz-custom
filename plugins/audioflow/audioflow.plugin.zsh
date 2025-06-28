@@ -10,7 +10,8 @@ new-mbira-project() {
 	local PROJECT_PATH="$MBIRA_PROJECT_HOME/$PROJECT_NAME"
 
 	# Create the folder structure
-	mkdir -p "$PROJECT_PATH"/{combined,kushaura,kutsinhira}
+	#mkdir -p "$PROJECT_PATH"/{exports,kushaura,kutsinhira,combined}
+	mkdir -p "$PROJECT_PATH"/exports
 
 	echo "Folder structure created for '$PROJECT_NAME':"
 	tree "$PROJECT_PATH"
