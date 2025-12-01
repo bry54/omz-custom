@@ -101,13 +101,13 @@ exportdirfiles() {
 
     # Create CSV header
     echo "Name,Size (MB),Path" > "$output_file"
-    
+
     # Find all files starting from the parent directory, sort by name, and then process
     find "$parent_dir" -type f | sort | while read -r file; do
         size=$(du -m "$file" | awk '{print $1}')
         echo "$(basename "$file"),$size,$file" >> "$output_file"
     done
-    
+
     echo "CSV file generated: $output_file"
 }
 
@@ -125,4 +125,51 @@ container-shell(){
     echo "Zsh failed, falling back to Bash shell."
     docker exec -it $1 /bin/bash
   fi
+}
+
+batch-wget() {
+  if [ $# -ne 1 ]; then
+    echo "Usage: batch-wget <directory_with_paths.txt>"
+    return 1
+  fi
+
+  TARGET_DIR="$1"
+  MAPPING_FILE="$TARGET_DIR/paths.txt"
+
+  # Check for mapping file
+  if [ ! -f "$MAPPING_FILE" ]; then
+    echo "❌ paths.txt not found in: $TARGET_DIR"
+    return 1
+  fi
+
+  echo "📂 Using mapping file: $MAPPING_FILE"
+  echo "📥 Download directory: $TARGET_DIR"
+  echo "-----------------------------------"
+
+  # Read each line safely: URL first, then the rest of the line as DEST_NAME
+  while IFS= read -r LINE; do
+    # Skip empty lines or comments
+    [[ -z "$LINE" || "$LINE" =~ ^# ]] && continue
+
+    URL="${LINE%% *}"                # everything before first space
+    DEST_NAME="${LINE#* }"           # everything after first space
+
+    # Trim spaces
+    URL="$(echo "$URL" | xargs)"
+    DEST_NAME="$(echo "$DEST_NAME" | xargs)"
+
+    DEST_PATH="$TARGET_DIR/$DEST_NAME"
+
+    mkdir -p "$(dirname "$DEST_PATH")"
+
+    if [ -f "$DEST_PATH" ]; then
+      echo "⏩ Skipping (already exists): $DEST_NAME"
+      continue
+    fi
+
+    echo "⬇️  Downloading: $URL → $DEST_NAME"
+    wget -c -nc "$URL" -O "$DEST_PATH"
+  done < "$MAPPING_FILE"
+
+  echo "✅ All downloads completed!"
 }
