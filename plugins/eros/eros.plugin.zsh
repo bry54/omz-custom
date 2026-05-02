@@ -42,7 +42,7 @@ erosbulkrename(){
             # New file path in the destination directory
             new_file="$dest_directory/$new_name"
 
-            # Copy and rename the file to the destination directory
+            # Move and rename the file to the destination directory
             mv "$file" "$new_file"
 
             # Print the old and new file names to the log file
@@ -88,7 +88,7 @@ erosserve(){
 eros-video-collect(){
   source="$1"
   destination="$2"
-  extenstions=("vid" "mp4")
+  extensions=("vid" "mp4")
 
   # Check if the directory exists
   if [ ! -d "$source" ]; then
@@ -102,22 +102,27 @@ eros-video-collect(){
       return 1
   fi
 
+  if ! command -v bulkextensiontransformer &>/dev/null; then
+      echo "Error: bulkextensiontransformer not found. Is the helpers plugin loaded?"
+      return 1
+  fi
+
   # Loop through each element in the array
-  for ext in "${extenstions[@]}"; do
+  for ext in "${extensions[@]}"; do
     echo "$source" "$ext" "eros"
     bulkextensiontransformer "$source" "$ext" "eros"
   done
 
   erosbulkrename "${source}" "${destination}"
 
-  find "$base_directory" -type d -empty -exec rmdir {} +
+  find "$source" -type d -empty -exec rmdir {} +
   echo "Empty folders cleaned up."
 }
 
 eros-image-collect(){
 	if [ $# -ne 2 ]; then
-	  echo "Usage: $0 <source_directory> <destination_directory>"
-	  exit 1
+	  echo "Usage: eros-image-collect <source_directory> <destination_directory>"
+	  return 1
 	fi
 
 	# Define source and destination directories

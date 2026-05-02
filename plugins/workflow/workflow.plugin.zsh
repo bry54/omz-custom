@@ -1,9 +1,9 @@
 # ============================================================
-#  ck-dev — CosmaKeri Developer Workflow Plugin
+#  workflow — CosmaKeri Developer Workflow Plugin
 #  Oh My Zsh custom plugin
 #
-#  Install: cp ck-dev.plugin.zsh ~/.oh-my-zsh/custom/plugins/ck-dev/
-#           then add 'ck-dev' to plugins=() in ~/.zshrc
+#  Install: cp workflow.plugin.zsh ~/.oh-my-zsh/custom/plugins/workflow/
+#           then add 'workflow' to plugins=() in ~/.zshrc
 #
 #  CosmaKeri Technologies (Pvt) Ltd
 #  Ordered by Legacy. Driven by Innovation.
@@ -17,10 +17,10 @@ CK_PERSONAL="$HOME/Development/Personal"
 # ── INTERNAL: scaffold Code/Documents/Design ─────────────────
 # Usage: _ck_scaffold <full_path>
 _ck_scaffold() {
-    local path="$1"
-    mkdir -p "$path"/{Code,Documents,Design}
-    mkdir -p "$path"/Documents/{Contracts,Proposals,Invoices,Notes}
-    echo "✓  Scaffolded: $path"
+    local dir="$1"
+    mkdir -p "$dir"/{Code,Documents,Design}
+    mkdir -p "$dir"/Documents/{Contracts,Proposals,Invoices,Notes}
+    echo "✓  Scaffolded: $dir"
 }
 
 # ── NEW CK PROJECT ────────────────────────────────────────────
@@ -261,7 +261,7 @@ alias gcm='git commit -m'
 # ── HELP ──────────────────────────────────────────────────────
 ck-help() {
     echo ""
-    echo "  ck-dev — CosmaKeri Developer Plugin"
+    echo "  workflow — CosmaKeri Developer Plugin"
     echo "  ────────────────────────────────────────────────────"
     echo ""
     echo "  SCAFFOLD"
