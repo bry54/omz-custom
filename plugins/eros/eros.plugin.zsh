@@ -46,7 +46,7 @@ erosbulkrename(){
             mv "$file" "$new_file"
 
             # Print the old and new file names to the log file
-            echo "$new_name -> $parent_dir/$old_name" >> "$log_file"
+            echo "$new_name -> /$old_name" >> "$log_file"
         fi
     done
 
@@ -64,7 +64,7 @@ erosserve(){
 
   docker run -d \
   --name eros \
-  --restart no \
+  --restart unless-stopped \
   -p 9999:9999 \
   --log-driver json-file \
   --log-opt max-file=10 \
@@ -81,6 +81,7 @@ erosserve(){
   -v "$EROS_HOME/cache":/cache \
   -v "$EROS_HOME/blobs":/blobs \
   -v "$EROS_HOME/generated":/generated \
+  --init \
   stashapp/stash:latest
 }
 
