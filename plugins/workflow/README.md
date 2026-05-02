@@ -1,35 +1,53 @@
-# Workflow plugin
+# workflow plugin
 
 This plugin provides scaffolding, navigation, and git shortcuts for the CosmaKeri development workflow.
+
+To use it, add `workflow` to the plugins array in your zshrc file:
 
 ```zsh
 plugins=(... workflow)
 ```
 
-## Installation
-
-```zsh
-cp workflow.plugin.zsh ~/.oh-my-zsh/custom/plugins/workflow/
-```
-
-Then add `workflow` to your plugins list in `~/.zshrc` and reload:
-
-```zsh
-source ~/.zshrc
-```
-
 ---
 
-## Scaffold
+## Bootstrap
 
 | Command | Description |
 | :--- | :--- |
-| `new-ck-project <repo>` | Creates a new CosmaKeri product under `~/Dev/CosmaKeri/Code/`. Enforces `ck-` prefix. Initialises git with first commit. |
-| `new-client <Name>` | Creates a new client folder under `~/Dev/Clients/` with `Code/`, `Documents/`, and `Design/` subfolders. |
-| `new-client-project <Name> <type>` | Creates a new repo inside an existing client's `Code/` folder. Enforces `client-name-type` naming convention. Initialises git with first commit. |
-| `new-personal-project <name>` | Creates a new personal project under `~/Dev/Personal/` with `Code/` and `Documents/` subfolders. |
+| `ck-bootstrap` | Creates the full CosmaKeri directory structure from scratch under `~/Development/` |
 
-### Project types for `new-client-project`
+---
+
+## Scaffold — CosmaKeri
+
+| Command | Description |
+| :--- | :--- |
+| `ck-new-project <repo>` | Creates a new flat CK repo under `CK/Code/`. Enforces `ck-` prefix. Initialises git with first commit. |
+| `ck-new-template <repo>` | Creates a new reusable starter under `CK/Code/Templates/`. Enforces `ck-template-` prefix. Initialises git with first commit. |
+| `ck-new-product <Product> <type>` | Creates a new repo under `CK/Code/Products/<Product>/`. Named `ck-<product>-<type>`. Initialises git with first commit. |
+
+### Types for `ck-new-product`
+
+| Type | Description |
+| :--- | :--- |
+| `backend` | NestJS API |
+| `frontend` | React application |
+| `admin` | Admin dashboard |
+| `mobile` | Mobile application |
+| `api` | Standalone API |
+| `docs` | Documentation |
+| `infra` | Infrastructure / DevOps |
+
+---
+
+## Scaffold — Clients
+
+| Command | Description |
+| :--- | :--- |
+| `ck-new-client <Name>` | Creates a new client folder under `Clients/` with `Code/`, `Documents/`, and `Design/` subfolders |
+| `ck-new-client-project <Name> <type>` | Creates a new repo inside an existing client's `Code/` folder. Named `client-<name>-<type>`. Initialises git with first commit. |
+
+### Types for `ck-new-client-project`
 
 | Type | Description |
 | :--- | :--- |
@@ -42,17 +60,27 @@ source ~/.zshrc
 
 ---
 
+## Scaffold — Personal
+
+| Command | Description |
+| :--- | :--- |
+| `new-personal-project <name>` | Creates a new personal project under `~/Development/Personal/Code/`. Initialises git. |
+
+---
+
 ## Navigation
 
-| Alias | Description |
+| Alias | Path |
 | :--- | :--- |
-| `dev` | Navigate to `~/Dev` |
-| `ck` | Navigate to `~/Dev/CosmaKeri` |
-| `ck-code` | Navigate to `~/Dev/CosmaKeri/Code` |
-| `ck-docs` | Navigate to `~/Dev/CosmaKeri/Documents` |
-| `ck-design` | Navigate to `~/Dev/CosmaKeri/Design` |
-| `clients` | Navigate to `~/Dev/Clients` |
-| `personal` | Navigate to `~/Dev/Personal` |
+| `dev` | `~/Development` |
+| `ck` | `~/Development/CosmaKeri/CK` |
+| `ck-code` | `~/Development/CosmaKeri/CK/Code` |
+| `ck-templates` | `~/Development/CosmaKeri/CK/Code/Templates` |
+| `ck-products` | `~/Development/CosmaKeri/CK/Code/Products` |
+| `ck-docs` | `~/Development/CosmaKeri/CK/Documents` |
+| `ck-design` | `~/Development/CosmaKeri/CK/Design` |
+| `ck-clients` | `~/Development/CosmaKeri/Clients` |
+| `personal` | `~/Development/Personal` |
 
 ---
 
@@ -60,9 +88,11 @@ source ~/.zshrc
 
 | Command | Description |
 | :--- | :--- |
-| `ck-list` | Lists all CosmaKeri projects, clients with their repos, and personal projects |
-| `ck-open <repo>` | Opens a CosmaKeri repo in VS Code |
-| `ck-open <Client> <type>` | Opens a client project in VS Code |
+| `ck-list` | Lists all CK repos (flat, templates, products), clients with their repos, and personal projects |
+| `ck-open ck-<repo>` | Opens a flat CK repo in VS Code |
+| `ck-open template <name>` | Opens `Templates/ck-template-<name>` in VS Code |
+| `ck-open product <Product> <type>` | Opens `Products/<Product>/ck-<product>-<type>` in VS Code |
+| `ck-open client <Client> <type>` | Opens `Clients/<Client>/Code/client-<name>-<type>` in VS Code |
 | `ck-help` | Prints all available commands |
 
 ---
@@ -72,7 +102,7 @@ source ~/.zshrc
 | Alias | Command | Description |
 | :--- | :--- | :--- |
 | `gs` | `git status` | Show working tree status |
-| `gl` | `git log --oneline --graph --decorate -10` | Show last 10 commits as graph |
+| `gl` | `git log --oneline --graph --decorate -10` | Show last 10 commits as a graph |
 | `gp` | `git push` | Push to remote |
 | `gpl` | `git pull` | Pull from remote |
 | `gco` | `git checkout` | Checkout branch or file |
@@ -86,34 +116,56 @@ source ~/.zshrc
 
 | Alias | Description |
 | :--- | :--- |
-| `aws <command>` | Runs AWS CLI via Docker — executes supplied command |
-| `composer <command>` | Runs Composer via Docker — executes supplied command |
+| `aws <command>` | Runs AWS CLI via Docker |
+| `composer <command>` | Runs Composer via Docker |
 
 ---
 
-## Folder Structure
-
-This plugin assumes the following structure under `~/Dev`:
+## Directory Structure
 
 ```
-~/Dev/
+~/Development/
 ├── CosmaKeri/
-│   ├── Code/
-│   ├── Documents/
-│   └── Design/
-├── Clients/
-│   └── ClientName/
-│       ├── Code/
-│       ├── Documents/
-│       └── Design/
+│   ├── CK/
+│   │   ├── Code/
+│   │   │   ├── Templates/        ck-template-* starters
+│   │   │   ├── Products/         multi-repo sub-brands
+│   │   │   │   └── Pay/
+│   │   │   │       └── ck-pay-*  backend, frontend, admin, infra
+│   │   │   └── ck-*              flat single repos (ck-website, ck-infra)
+│   │   ├── Documents/
+│   │   │   ├── Legal/
+│   │   │   ├── Finance/
+│   │   │   ├── Admin/
+│   │   │   └── Proposals/
+│   │   └── Design/
+│   │       ├── Logos/
+│   │       ├── Brand/
+│   │       └── Marketing/
+│   └── Clients/
+│       └── ClientName/
+│           ├── Code/             client-name-* repos
+│           ├── Documents/
+│           │   ├── Contracts/
+│           │   ├── Proposals/
+│           │   ├── Invoices/
+│           │   └── Notes/
+│           └── Design/
+│               ├── Mockups/
+│               ├── Assets/
+│               └── Guidelines/
 └── Personal/
+    ├── Code/
+    └── Documents/
 ```
 
 ---
 
-## Repo Naming Convention
+## Naming Conventions
 
 | Prefix | Usage |
 | :--- | :--- |
-| `ck-` | CosmaKeri own products e.g. `ck-pay`, `ck-website` |
-| `client-` | Client work e.g. `client-acme-frontend`, `client-acme-backend` |
+| `ck-` | CosmaKeri flat repos — `ck-website`, `ck-infra`, `ck-docs` |
+| `ck-template-` | Reusable starters — `ck-template-nestjs`, `ck-template-react` |
+| `ck-<product>-` | Product repos — `ck-pay-backend`, `ck-pay-frontend` |
+| `client-` | Client work — `client-acme-frontend`, `client-acme-backend` |
